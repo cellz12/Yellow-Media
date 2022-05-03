@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx:1.12-alpine
+    ports:
+      - 8300:80
+    volumes:
+      - ./:/app
+      - ./docker/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
+    restart: unless-stopped
+    depends_on:
+      - app
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+  db:
+    image: postgres:14.2
+    restart: unless-stopped
+    volumes:
+      - /var/lib/yellow-media/postgresql/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - 127.0.0.1:5434:5432
