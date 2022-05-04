@@ -6,11 +6,9 @@ use Closure;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Http\Request;
 
-class Authenticate
+class GuestMiddleware
 {
     /**
-     * The authentication guard factory instance.
-     *
      * @var Auth
      */
     protected Auth $auth;
@@ -27,8 +25,6 @@ class Authenticate
     }
 
     /**
-     * Handle an incoming request.
-     *
      * @param Request $request
      * @param Closure $next
      * @param string|null $guard
@@ -36,8 +32,8 @@ class Authenticate
      */
     public function handle(Request $request, Closure $next, string $guard = null): mixed
     {
-        if ($this->auth->guard($guard)->guest()) {
-            return response('Unauthorized.', 401);
+        if (!$this->auth->guard($guard)->guest()) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
         return $next($request);

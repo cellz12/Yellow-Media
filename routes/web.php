@@ -1,20 +1,28 @@
 <?php
 
-/** @var Router $router */
+/** @var Laravel\Lumen\Routing\Router $router */
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
+$router->group(['prefix' => 'api'], function () use ($router) {
+    $router->group(['prefix' => 'user'], function () use ($router) {
 
-use Laravel\Lumen\Routing\Router;
+        $router->group(['middleware' => ['guest']], function () use ($router) {
+            $router->post('register', '\App\Http\Controllers\Api\UserController@store');
+            $router->post('sign-in', '\App\Http\Controllers\Api\AuthController@signIn');
+            $router->post('recover-password', '\App\Http\Controllers\Api\AuthController@recoverPassword');
+            $router->get('password/{token}', [
+                'as' => 'password.reset',
+                'uses' => '\App\Http\Controllers\Api\AuthController@passwordReset'
+            ]);
 
-$router->get('/', function () use ($router) {
-    return 1;
+        });
+
+        $router->group(['middleware' => ['auth']], function () use ($router) {
+            $router->post('sign-out', '\App\Http\Controllers\Api\AuthController@signOut');
+        });
+
+        $router->group(['prefix' => 'companies', 'middleware' => ['auth']], function () use ($router) {
+            $router->get('/', '\App\Http\Controllers\Api\UserCompanyController@index');
+            $router->post('/', '\App\Http\Controllers\Api\UserCompanyController@store');
+        });
+    });
 });

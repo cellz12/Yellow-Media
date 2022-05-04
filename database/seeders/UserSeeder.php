@@ -2,19 +2,19 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 /**
- * Class DatabaseSeeder
+ * Class UserSeeder
 */
-class DatabaseSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * @return void
      */
     public function run()
     {
-        $this->call(UserSeeder::class);
-        $this->call(CompanySeeder::class);
+        User::factory()->count(50)->create();
     }
 }
